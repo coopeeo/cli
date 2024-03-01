@@ -479,7 +479,7 @@ fn poll_login(
 
 	
 	if response.status() != 200 {
-		info!("Login Incomplete: {}", parsed.error.to_string());
+		info!("Login Incomplete: {}", parsed.error.to_string().nice_unwrap("Unable to parse error."));
 		return None;
 	}
 
