@@ -470,7 +470,7 @@ fn poll_login(
 		.send()
 		.nice_unwrap("Unable to connect to Geode Index");
 
-	let status = response.status()
+	let status = response.status();
 	
 	info!("Checking login status");
 	info!("Response Code: {}", response.status());
