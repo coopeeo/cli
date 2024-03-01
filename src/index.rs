@@ -470,6 +470,8 @@ fn poll_login(
 		.send()
 		.nice_unwrap("Unable to connect to Geode Index");
 
+	let status = response.status()
+	
 	info!("Checking login status");
 	info!("Response Code: {}", response.status());
 
@@ -478,7 +480,7 @@ fn poll_login(
 		.nice_unwrap("Unable to parse login response");
 
 	
-	if response.status() != 200 {
+	if status != 200 {
 		info!("Login Incomplete: {}", parsed.error.unwrap_or_default());
 		return None;
 	}
