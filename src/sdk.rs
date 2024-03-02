@@ -364,7 +364,7 @@ fn update(config: &mut Config, branch: Option<String>) {
 }
 
 fn switch_to_ref(repo: &Repository, name: &str) {
-	let mut reference = repo.find_reference("refs/heads/main").unwrap();
+	let mut reference = repo.find_reference("refs/heads/new-index-but-better").unwrap();
 	let fetch_head = repo.find_reference("FETCH_HEAD").unwrap();
 	let fetch_commit = repo.reference_to_annotated_commit(&fetch_head).unwrap();
 
@@ -398,8 +398,13 @@ fn switch_to_tag(config: &mut Config, repo: &Repository) {
 			config.sdk_version = None;
 			fatal!("Unable to find tag {ver}");
 		}
-		switch_to_ref(repo, ref_str.as_str());
-		info!("Switched to {ver}");
+		if ref_str = "refs/tags/new-index-but-better" {
+			switch_to_ref(repo, "refs/heads/new-index-but-better");
+			info!("Switched to latest commit");
+		} else {
+			switch_to_ref(repo, ref_str.as_str());
+			info!("Switched to {ver}");
+		}
 		return;
 	}
 
