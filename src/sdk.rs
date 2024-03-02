@@ -283,11 +283,7 @@ fn fetch_repo_info(repo: &git2::Repository) -> git2::MergeAnalysis {
 		true
 	});
 
-	let res = remote.fetch(
-		&["new-index-but-better"],
-		Some(FetchOptions::new().remote_callbacks(callbacks)),
-		None,
-	);
+	let res = repo.find_branch(&"refs/heads/new-index-but-better", git2::BranchType::Local)?;
 	if res.as_ref().is_err_and(|e| {
 		e.message()
 			.contains("authentication required but no callback set")
@@ -364,16 +360,16 @@ fn update(config: &mut Config, branch: Option<String>) {
 }
 
 fn switch_to_ref(repo: &Repository, name: &str) {
-	let mut reference = repo.find_reference("refs/heads/new-index-but-better").unwrap();
+	//let mut reference = repo.find_reference("refs/heads/new-index-but-better").unwrap();
 	let fetch_head = repo.find_reference("FETCH_HEAD").unwrap();
 	let fetch_commit = repo.reference_to_annotated_commit(&fetch_head).unwrap();
 
-	reference
-		.set_target(fetch_commit.id(), "Fast-Forward")
-		.unwrap();
-	repo.set_head("refs/heads/new-index-but-better").unwrap();
-	repo.checkout_head(Some(CheckoutBuilder::default().force()))
-		.nice_unwrap("Failed to checkout new-index-but-better");
+	//reference
+	//	.set_target(fetch_commit.id(), "Fast-Forward")
+	//	.unwrap();
+	//repo.set_head("refs/heads/new-index-but-better").unwrap();
+	//repo.checkout_head(Some(CheckoutBuilder::default().force()))
+	//	.nice_unwrap("Failed to checkout new-index-but-better");
 
 	let (obj, refer) = repo.revparse_ext(name).unwrap();
 	repo.checkout_tree(&obj, None)
