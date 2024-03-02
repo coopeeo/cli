@@ -389,7 +389,7 @@ fn switch_to_tag(config: &mut Config, repo: &Repository) {
 	info!("Updating head");
 
 	if config.sdk_nightly {
-		switch_to_ref(repo, "refs/heads/main");
+		switch_to_ref(repo, "refs/heads/new-index-but-better");
 		info!("Switched to latest commit");
 		return;
 	} else if let Some(ver) = config.sdk_version.clone() {
