@@ -364,7 +364,7 @@ fn update(config: &mut Config, branch: Option<String>) {
 }
 
 fn switch_to_ref(repo: &Repository, name: &str) {
-	let mut reference = repo.find_reference("refs/heads/new-index-but-better").unwrap();
+	let mut reference = repo.find_reference("refs/heads/main").unwrap();
 	let fetch_head = repo.find_reference("FETCH_HEAD").unwrap();
 	let fetch_commit = repo.reference_to_annotated_commit(&fetch_head).unwrap();
 
