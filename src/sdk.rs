@@ -247,7 +247,7 @@ fn install(config: &mut Config, path: PathBuf, force: bool) {
 	builder.fetch_options(fetch);
 
 	let repo = builder
-		.clone("https://github.com/geode-sdk/geode", &path)
+		.clone("https://github.com/coopeeo/geode", &path)
 		.nice_unwrap("Could not download SDK");
 
 	// set GEODE_SDK environment variable;
@@ -284,7 +284,7 @@ fn fetch_repo_info(repo: &git2::Repository) -> git2::MergeAnalysis {
 	});
 
 	let res = remote.fetch(
-		&["new-index-but-better"],
+		&["main"],
 		Some(FetchOptions::new().remote_callbacks(callbacks)),
 		None,
 	);
@@ -294,7 +294,7 @@ fn fetch_repo_info(repo: &git2::Repository) -> git2::MergeAnalysis {
 	}) {
 		// Setting the authentication callback is kinda jank, just call the git process lmao
 		Command::new("git")
-			.args(&["fetch", "origin", "new-index-but-better"])
+			.args(&["fetch", "origin", "main"])
 			.current_dir(Config::sdk_path())
 			.spawn()
 			.nice_unwrap("Could not fetch latest update")
@@ -364,19 +364,19 @@ fn update(config: &mut Config, branch: Option<String>) {
 }
 
 fn switch_to_ref(repo: &Repository, name: &str) {
-	//let mut reference = repo.find_reference("refs/heads/new-index-but-better").unwrap();
+	let mut reference = repo.find_reference("refs/heads/main").unwrap();
 	let fetch_head = repo.find_reference("FETCH_HEAD").unwrap();
 	let fetch_commit = repo.reference_to_annotated_commit(&fetch_head).unwrap();
 
-	//reference
-	//	.set_target(fetch_commit.id(), "Fast-Forward")
-	//	.unwrap();
-	//repo.set_head("refs/heads/new-index-but-better").unwrap();
-	//repo.checkout_head(Some(CheckoutBuilder::default().force()))
-	//	.nice_unwrap("Failed to checkout new-index-but-better");
-	let branch = repo.find_branch(name, git2::BranchType::Local);
+	reference
+		.set_target(fetch_commit.id(), "Fast-Forward")
+		.unwrap();
+	repo.set_head("refs/heads/main").unwrap();
+	repo.checkout_head(Some(CheckoutBuilder::default().force()))
+		.nice_unwrap("Failed to checkout main");
+
 	let (obj, refer) = repo.revparse_ext(name).unwrap();
-	repo.checkout_tree(branch.peel_to_commit(), None)
+	repo.checkout_tree(&obj, None)
 		.nice_unwrap("Unable to checkout tree");
 	match refer {
 		Some(refer) => repo.set_head(refer.name().unwrap()),
@@ -389,17 +389,17 @@ fn switch_to_tag(config: &mut Config, repo: &Repository) {
 	info!("Updating head");
 
 	if config.sdk_nightly {
-		switch_to_ref(repo, "refs/heads/new-index-but-better");
+		switch_to_ref(repo, "refs/heads/main");
 		info!("Switched to latest commit");
 		return;
 	} else if let Some(ver) = config.sdk_version.clone() {
-		let ref_str = format!("refs/heads/{ver}");
-		//if repo.find_reference(ref_str.as_str()).is_err() {
-		//	config.sdk_version = None;
-		//	fatal!("Unable to find tag {ver}");
-		//}
-		switch_to_ref(repo, "refs/heads/new-index-but-better");
-		info!("Switched to latest commit");
+		let ref_str = format!("refs/tags/{ver}");
+		if repo.find_reference(ref_str.as_str()).is_err() {
+			config.sdk_version = None;
+			fatal!("Unable to find tag {ver}");
+		}
+		switch_to_ref(repo, ref_str.as_str());
+		info!("Switched to {ver}");
 		return;
 	}
 
@@ -446,7 +446,7 @@ fn install_binaries(config: &mut Config, platform: Option<String>) {
 
 	let res = reqwest::blocking::Client::new()
 		.get(format!(
-			"https://api.github.com/repos/geode-sdk/geode/releases/tags/{}",
+			"https://api.github.com/repos/coopeeo/geode/releases/tags/{}",
 			release_tag
 		))
 		.header(USER_AGENT, "github_api/1.0")
