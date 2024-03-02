@@ -283,7 +283,11 @@ fn fetch_repo_info(repo: &git2::Repository) -> git2::MergeAnalysis {
 		true
 	});
 
-	let res = repo.find_branch(&"refs/heads/new-index-but-better", git2::BranchType::Local)?;
+	let res = remote.fetch(
+		&["new-index-but-better"],
+		Some(FetchOptions::new().remote_callbacks(callbacks)),
+		None,
+	);
 	if res.as_ref().is_err_and(|e| {
 		e.message()
 			.contains("authentication required but no callback set")
