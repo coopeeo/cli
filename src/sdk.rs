@@ -374,9 +374,9 @@ fn switch_to_ref(repo: &Repository, name: &str) {
 	//repo.set_head("refs/heads/new-index-but-better").unwrap();
 	//repo.checkout_head(Some(CheckoutBuilder::default().force()))
 	//	.nice_unwrap("Failed to checkout new-index-but-better");
-	let branch = repo.find_branch(name, git2::BranchType::Local)?;
+	let branch = repo.find_branch(name, git2::BranchType::Local);
 	let (obj, refer) = repo.revparse_ext(name).unwrap();
-	repo.checkout_tree(branch.get().peel_to_tree()?, None)?
+	repo.checkout_tree(branch.get().peel_to_tree(), None)
 		.nice_unwrap("Unable to checkout tree");
 	match refer {
 		Some(refer) => repo.set_head(refer.name().unwrap()),
