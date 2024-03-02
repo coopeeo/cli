@@ -393,18 +393,13 @@ fn switch_to_tag(config: &mut Config, repo: &Repository) {
 		info!("Switched to latest commit");
 		return;
 	} else if let Some(ver) = config.sdk_version.clone() {
-		let ref_str = format!("refs/tags/{ver}");
+		let ref_str = format!("refs/heads/{ver}");
 		if repo.find_reference(ref_str.as_str()).is_err() {
 			config.sdk_version = None;
 			fatal!("Unable to find tag {ver}");
 		}
-		if ref_str = "refs/tags/new-index-but-better" {
-			switch_to_ref(repo, "refs/heads/new-index-but-better");
-			info!("Switched to latest commit");
-		} else {
-			switch_to_ref(repo, ref_str.as_str());
-			info!("Switched to {ver}");
-		}
+		switch_to_ref(repo, "refs/heads/new-index-but-better");
+		info!("Switched to latest commit");
 		return;
 	}
 
